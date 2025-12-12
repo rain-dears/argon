@@ -3,18 +3,23 @@ package dev.lvstrng.argon.module;
 import dev.lvstrng.argon.Argon;
 import dev.lvstrng.argon.event.events.ButtonListener;
 import dev.lvstrng.argon.module.modules.client.ClickGUI;
-import dev.lvstrng.argon.module.modules.client.SelfDestruct;
 import dev.lvstrng.argon.module.modules.combat.AimAssist;
 import dev.lvstrng.argon.module.modules.combat.AnchorFill;
 import dev.lvstrng.argon.module.modules.combat.AnchorMacro;
 import dev.lvstrng.argon.module.modules.combat.AutoCrystal;
+import dev.lvstrng.argon.module.modules.combat.AutoDoubleHand;
+import dev.lvstrng.argon.module.modules.combat.AutoHitCrystal;
 import dev.lvstrng.argon.module.modules.combat.AutoInventoryTotem;
 import dev.lvstrng.argon.module.modules.combat.DoubleAnchor;
 import dev.lvstrng.argon.module.modules.combat.HoverTotem;
-import dev.lvstrng.argon.module.modules.combat.KeyPearl;
 import dev.lvstrng.argon.module.modules.combat.ShieldDisabler;
+import dev.lvstrng.argon.module.modules.combat.TotemOffhand;
 import dev.lvstrng.argon.module.modules.combat.TriggerBot;
+import dev.lvstrng.argon.module.modules.misc.KeyPearl;
+import dev.lvstrng.argon.module.modules.misc.Prevent;
+import dev.lvstrng.argon.module.modules.misc.Sprint;
 import dev.lvstrng.argon.module.modules.render.HUD;
+import dev.lvstrng.argon.module.modules.render.NoBounce;
 import dev.lvstrng.argon.module.setting.KeybindSetting;
 import dev.lvstrng.argon.utils.EncryptedString;
 
@@ -36,15 +41,23 @@ public final class ModuleManager implements ButtonListener {
                 add(new AnchorFill());
                 add(new AnchorMacro());
                 add(new AutoCrystal());
+                add(new AutoDoubleHand());
+                add(new AutoHitCrystal());
                 add(new AutoInventoryTotem());
                 add(new DoubleAnchor());
                 add(new HoverTotem());
                 add(new ShieldDisabler());
+                add(new TotemOffhand());
                 add(new TriggerBot());
-                add(new KeyPearl());
 
-                //UI
+                // Misc
+                add(new KeyPearl());
+                add(new Prevent());
+                add(new Sprint());
+
+                // Render / UI
                 add(new HUD());
+                add(new NoBounce());
                 add(new ClickGUI());
         }
 
@@ -86,11 +99,9 @@ public final class ModuleManager implements ButtonListener {
 
 	@Override
 	public void onButtonPress(ButtonEvent event) {
-		if(!SelfDestruct.destruct) {
-			modules.forEach(module -> {
-				if(module.getKey() == event.button && event.action == GLFW.GLFW_PRESS)
-					module.toggle();
-			});
-		}
-	}
+                modules.forEach(module -> {
+                        if(module.getKey() == event.button && event.action == GLFW.GLFW_PRESS)
+                                module.toggle();
+                });
+        }
 }

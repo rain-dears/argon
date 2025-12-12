@@ -6,31 +6,19 @@
   "mixins": [
     "ClientConnectionMixin",
     "EndCrystalItemMixin",
-    "ItemStackMixin",
-    "LivingEntityAccessor",
-    "WorldAccessor"
+    "ItemStackMixin"
   ],
   "client": [
-    "BufferRendererAccessor",
-    "CameraMixin",
     "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerAccessor",
-    "ClientPlayerInteractionManagerMixin",
-    "FrustumAccessor",
-    "GameRendererMixin",
     "HandledScreenMixin",
     "InGameHudMixin",
-    "KeyBindingAccessor",
-    "KeyBindingMixin",
     "KeyboardMixin",
     "MinecraftClientAccessor",
     "MinecraftClientMixin",
     "MouseHandlerAccessor",
     "MouseMixin",
-    "OtherClientPlayerEntityAccessor",
-    "ScreenMixin",
-    "ShaderProgramAccessor",
-    "WorldRendererAccessor"
+    "ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
