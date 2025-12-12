@@ -14,12 +14,12 @@ import net.minecraft.util.math.BlockPos;
 import org.lwjgl.glfw.GLFW;
 
 public final class DoubleAnchor extends Module implements TickListener {
-	public DoubleAnchor() {
-		super(EncryptedString.of("Double Anchor"),
-				EncryptedString.of("Helps you do the air place/double anchor"),
-				-1,
-				Category.COMBAT);
-	}
+        public DoubleAnchor() {
+                super(EncryptedString.of("Airplace"),
+                                EncryptedString.of("Helps you perform double-click air place anchors"),
+                                -1,
+                                Category.COMBAT);
+        }
 
 	private BlockPos pos;
 	private int count;

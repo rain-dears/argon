@@ -3,11 +3,18 @@ package dev.lvstrng.argon.module;
 import dev.lvstrng.argon.Argon;
 import dev.lvstrng.argon.event.events.ButtonListener;
 import dev.lvstrng.argon.module.modules.client.ClickGUI;
-import dev.lvstrng.argon.module.modules.client.Friends;
 import dev.lvstrng.argon.module.modules.client.SelfDestruct;
-import dev.lvstrng.argon.module.modules.combat.*;
-import dev.lvstrng.argon.module.modules.misc.*;
-import dev.lvstrng.argon.module.modules.render.*;
+import dev.lvstrng.argon.module.modules.combat.AimAssist;
+import dev.lvstrng.argon.module.modules.combat.AnchorFill;
+import dev.lvstrng.argon.module.modules.combat.AnchorMacro;
+import dev.lvstrng.argon.module.modules.combat.AutoCrystal;
+import dev.lvstrng.argon.module.modules.combat.AutoInventoryTotem;
+import dev.lvstrng.argon.module.modules.combat.DoubleAnchor;
+import dev.lvstrng.argon.module.modules.combat.HoverTotem;
+import dev.lvstrng.argon.module.modules.combat.KeyPearl;
+import dev.lvstrng.argon.module.modules.combat.ShieldDisabler;
+import dev.lvstrng.argon.module.modules.combat.TriggerBot;
+import dev.lvstrng.argon.module.modules.render.HUD;
 import dev.lvstrng.argon.module.setting.KeybindSetting;
 import dev.lvstrng.argon.utils.EncryptedString;
 
@@ -25,50 +32,21 @@ public final class ModuleManager implements ButtonListener {
 	}
 
 	public void addModules() {
-		//Combat
-		add(new AimAssist());
-		add(new AnchorMacro());
-		add(new AutoCrystal());
-		add(new AutoDoubleHand());
-		add(new AutoHitCrystal());
-		add(new AutoInventoryTotem());
-		add(new TriggerBot());
-		add(new AutoPot());
-		add(new AutoPotRefill());
-		add(new AutoWTap());
-		add(new CrystalOptimizer());
-		add(new DoubleAnchor());
-		add(new HoverTotem());
-		add(new NoMissDelay());
-		add(new ShieldDisabler());
-		add(new TotemOffhand());
-		add(new AutoJumpReset());
+                add(new AimAssist());
+                add(new AnchorFill());
+                add(new AnchorMacro());
+                add(new AutoCrystal());
+                add(new AutoInventoryTotem());
+                add(new DoubleAnchor());
+                add(new HoverTotem());
+                add(new ShieldDisabler());
+                add(new TriggerBot());
+                add(new KeyPearl());
 
-		//Misc
-		add(new Prevent());
-		add(new AutoXP());
-		add(new NoJumpDelay());
-		add(new PingSpoof());
-		add(new FakeLag());
-		add(new AutoClicker());
-		add(new KeyPearl());
-		add(new NoBreakDelay());
-		add(new Freecam());
-		add(new PackSpoof());
-		add(new Sprint());
-
-		//Render
-		add(new HUD());
-		add(new NoBounce());
-		add(new PlayerESP());
-		add(new StorageEsp());
-		add(new TargetHud());
-
-		//Client
-		add(new ClickGUI());
-		add(new Friends());
-		add(new SelfDestruct());
-	}
+                //UI
+                add(new HUD());
+                add(new ClickGUI());
+        }
 
 	public List<Module> getEnabledModules() {
 		return modules.stream()

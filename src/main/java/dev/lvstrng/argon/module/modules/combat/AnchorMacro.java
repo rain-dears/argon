@@ -30,12 +30,14 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
 	private final NumberSetting switchChance = new NumberSetting(EncryptedString.of("Switch Chance"), 0, 100, 100, 1);
 	private final NumberSetting placeChance = new NumberSetting(EncryptedString.of("Place Chance"), 0, 100, 100, 1).setDescription(EncryptedString.of("Randomization"));
 	private final NumberSetting glowstoneDelay = new NumberSetting(EncryptedString.of("Glowstone Delay"), 0, 20, 0, 1);
-	private final NumberSetting glowstoneChance = new NumberSetting(EncryptedString.of("Glowstone Chance"), 0, 100, 100, 1);
-	private final NumberSetting explodeDelay = new NumberSetting(EncryptedString.of("Explode Delay"), 0, 20, 0, 1);
-	private final NumberSetting explodeChance = new NumberSetting(EncryptedString.of("Explode Chance"), 0, 100, 100, 1);
-	private final NumberSetting explodeSlot = new NumberSetting(EncryptedString.of("Explode Slot"), 1, 9, 1, 1);
-	private final BooleanSetting onlyOwn = new BooleanSetting(EncryptedString.of("Only Own"), false);
-	private final BooleanSetting onlyCharge = new BooleanSetting(EncryptedString.of("Only Charge"), false);
+        private final NumberSetting glowstoneChance = new NumberSetting(EncryptedString.of("Glowstone Chance"), 0, 100, 100, 1);
+        private final NumberSetting explodeDelay = new NumberSetting(EncryptedString.of("Explode Delay"), 0, 20, 0, 1);
+        private final NumberSetting explodeChance = new NumberSetting(EncryptedString.of("Explode Chance"), 0, 100, 100, 1);
+        private final NumberSetting explodeSlot = new NumberSetting(EncryptedString.of("Explode Slot"), 1, 9, 1, 1);
+        private final BooleanSetting onlyOwn = new BooleanSetting(EncryptedString.of("Only Own"), false);
+        private final BooleanSetting onlyCharge = new BooleanSetting(EncryptedString.of("Only Charge"), false);
+        private final KeybindSetting activationKey = new KeybindSetting(EncryptedString.of("Hold Key"), GLFW.GLFW_MOUSE_BUTTON_4, true)
+                        .setDescription(EncryptedString.of("Macro runs only while this key is held (Mouse Button 5 by default)"));
 
 	private int switchClock = 0;
 	private int glowstoneClock = 0;
@@ -44,13 +46,13 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
 	//hashset cuz in a hashset stuff cant repeat iirc
 	private final Set<BlockPos> ownedAnchors = new HashSet<>();
 
-	public AnchorMacro() {
-		super(EncryptedString.of("Anchor Macro"),
-				EncryptedString.of("Automatically blows up respawn anchors for you"),
-				-1,
-				Category.COMBAT);
-		addSettings(whileUse, stopOnKill, clickSimulation, placeChance, switchDelay, switchChance, glowstoneDelay, glowstoneChance, explodeDelay, explodeChance, explodeSlot, onlyOwn, onlyCharge);
-	}
+        public AnchorMacro() {
+                super(EncryptedString.of("Anchor Macro"),
+                                EncryptedString.of("Automatically blows up respawn anchors for you"),
+                                -1,
+                                Category.COMBAT);
+                addSettings(whileUse, stopOnKill, clickSimulation, placeChance, switchDelay, switchChance, glowstoneDelay, glowstoneChance, explodeDelay, explodeChance, explodeSlot, onlyOwn, onlyCharge, activationKey);
+        }
 
 	@Override
 	public void onEnable() {
@@ -70,9 +72,12 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
 	}
 
 	@Override
-	public void onTick() {
-		if (mc.currentScreen != null)
-			return;
+        public void onTick() {
+                if (mc.currentScreen != null)
+                        return;
+
+                if (!KeyUtils.isKeyPressed(activationKey.getValue()))
+                        return;
 
 		if (((mc.player.getMainHandStack().getItem().getComponents().contains(DataComponentTypes.FOOD) || mc.player.getMainHandStack().getItem() instanceof ShieldItem || mc.player.getOffHandStack().getItem() instanceof ShieldItem || mc.player.getOffHandStack().getItem().getComponents().contains(DataComponentTypes.FOOD)) && GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS) && !whileUse.getValue())
 			return;
