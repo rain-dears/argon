@@ -5,7 +5,6 @@ import dev.lvstrng.argon.event.events.AttackListener;
 import dev.lvstrng.argon.event.events.TickListener;
 import dev.lvstrng.argon.module.Category;
 import dev.lvstrng.argon.module.Module;
-import dev.lvstrng.argon.module.modules.client.Friends;
 import dev.lvstrng.argon.module.setting.BooleanSetting;
 import dev.lvstrng.argon.module.setting.MinMaxSetting;
 import dev.lvstrng.argon.module.setting.NumberSetting;
@@ -97,8 +96,8 @@ public final class TriggerBot extends Module implements TickListener, AttackList
 			if (!inScreen.getValue() && mc.currentScreen != null)
 				return;
 
-			if(Argon.INSTANCE.getModuleManager().getModule(Friends.class).antiAttack.getValue() && Argon.INSTANCE.getFriendManager().isAimingOverFriend())
-				return;
+                        if (Argon.INSTANCE.getFriendManager() != null && Argon.INSTANCE.getFriendManager().isAimingOverFriend())
+                                return;
 
 			Item item = mc.player.getMainHandStack().getItem();
 

@@ -1,7 +1,6 @@
 package dev.lvstrng.argon.utils;
 
 import dev.lvstrng.argon.Argon;
-import dev.lvstrng.argon.module.modules.client.Friends;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.Entity;
@@ -64,8 +63,8 @@ public final class WorldUtils {
 		for (PlayerEntity player : mc.world.getPlayers()) {
 			float distance = (float) distance(toPlayer.getPos(), player.getPos());
 
-			if(excludeFriends && Argon.INSTANCE.getModuleManager().getModule(Friends.class).disableAimAssist.getValue() && Argon.INSTANCE.getFriendManager().isFriend(player))
-				continue;
+                        if (excludeFriends && Argon.INSTANCE.getFriendManager() != null && Argon.INSTANCE.getFriendManager().isFriend(player))
+                                continue;
 
 			if (player != toPlayer && distance <= range && player.canSee(toPlayer) == seeOnly) {
 				if (distance < minRange) {
