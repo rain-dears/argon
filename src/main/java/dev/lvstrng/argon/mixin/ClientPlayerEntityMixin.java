@@ -2,7 +2,6 @@ package dev.lvstrng.argon.mixin;
 
 import com.mojang.authlib.GameProfile;
 import dev.lvstrng.argon.event.EventManager;
-import dev.lvstrng.argon.event.events.MovementPacketListener;
 import dev.lvstrng.argon.event.events.PlayerTickListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
@@ -26,14 +25,8 @@ public class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
 		super(world, profile);
 	}
 
-	@Inject(method = "sendMovementPackets", at = @At("HEAD"))
-	private void onSendMovementPackets(CallbackInfo ci) {
-		EventManager.fire(new MovementPacketListener.MovementPacketEvent());
-	}
-
-	@Inject(method = "tick", at = @At("HEAD"))
-	private void onPlayerTick(CallbackInfo ci) {
-		EventManager.fire(new PlayerTickListener.PlayerTickEvent());
-	}
-	//@Inject(method = "sendMovementPackets", at = @At("HEAD"))
+        @Inject(method = "tick", at = @At("HEAD"))
+        private void onPlayerTick(CallbackInfo ci) {
+                EventManager.fire(new PlayerTickListener.PlayerTickEvent());
+        }
 }

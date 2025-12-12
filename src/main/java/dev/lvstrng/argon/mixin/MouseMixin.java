@@ -3,7 +3,6 @@ package dev.lvstrng.argon.mixin;
 import dev.lvstrng.argon.event.EventManager;
 import dev.lvstrng.argon.event.events.ButtonListener;
 import dev.lvstrng.argon.event.events.MouseMoveListener;
-import dev.lvstrng.argon.event.events.MouseUpdateListener;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
 import org.lwjgl.glfw.GLFW;
@@ -18,14 +17,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MouseMixin {
 	@Shadow @Final private MinecraftClient client;
 
-	@Inject(method = "updateMouse", at = @At("RETURN"))
-	private void onMouseUpdate(CallbackInfo ci) {
-		EventManager.fire(new MouseUpdateListener.MouseUpdateEvent());
-	}
-
-	@Inject(method = "onCursorPos", at = @At("HEAD"), cancellable = true)
-	private void onMouseMove(long window, double x, double y, CallbackInfo ci) {
-		MouseMoveListener.MouseMoveEvent event = new MouseMoveListener.MouseMoveEvent(window, x, y);
+        @Inject(method = "onCursorPos", at = @At("HEAD"), cancellable = true)
+        private void onMouseMove(long window, double x, double y, CallbackInfo ci) {
+                MouseMoveListener.MouseMoveEvent event = new MouseMoveListener.MouseMoveEvent(window, x, y);
 
 		EventManager.fire(event);
 		if (event.isCancelled())

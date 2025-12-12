@@ -2,14 +2,16 @@ package dev.lvstrng.argon.mixin;
 
 import dev.lvstrng.argon.Argon;
 import dev.lvstrng.argon.event.EventManager;
-import dev.lvstrng.argon.event.events.*;
+import dev.lvstrng.argon.event.events.AttackListener;
+import dev.lvstrng.argon.event.events.BlockBreakingListener;
+import dev.lvstrng.argon.event.events.HudListener;
+import dev.lvstrng.argon.event.events.ItemUseListener;
+import dev.lvstrng.argon.event.events.TickListener;
 import dev.lvstrng.argon.utils.MouseSimulation;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.Window;
 import net.minecraft.client.world.ClientWorld;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,23 +25,14 @@ public class MinecraftClientMixin {
 	@Nullable
 	public ClientWorld world;
 
-	@Shadow
-	@Final
-	private Window window;
+        @Inject(method = "tick", at = @At("HEAD"))
+        private void onTick(CallbackInfo ci) {
+                if (world != null) {
+                        TickListener.TickEvent event = new TickListener.TickEvent();
 
-	@Inject(method = "tick", at = @At("HEAD"))
-	private void onTick(CallbackInfo ci) {
-		if (world != null) {
-			TickListener.TickEvent event = new TickListener.TickEvent();
-
-			EventManager.fire(event);
-		}
-	}
-
-	@Inject(method = "onResolutionChanged", at = @At("HEAD"))
-	private void onResolutionChanged(CallbackInfo ci) {
-		EventManager.fire(new ResolutionListener.ResolutionEvent(this.window));
-	}
+                        EventManager.fire(event);
+                }
+        }
 
 	@Inject(method = "doItemUse", at = @At("HEAD"), cancellable = true)
 	private void onItemUse(CallbackInfo ci) {

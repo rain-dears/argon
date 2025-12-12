@@ -5,7 +5,6 @@ import dev.lvstrng.argon.gui.ClickGui;
 import dev.lvstrng.argon.managers.FriendManager;
 import dev.lvstrng.argon.module.ModuleManager;
 import dev.lvstrng.argon.managers.ProfileManager;
-import dev.lvstrng.argon.utils.rotation.RotatorManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 
@@ -15,10 +14,9 @@ import java.net.*;
 
 @SuppressWarnings("all")
 public final class Argon {
-	public RotatorManager rotatorManager;
-	public ProfileManager profileManager;
-	public ModuleManager moduleManager;
-	public EventManager eventManager;
+        public ProfileManager profileManager;
+        public ModuleManager moduleManager;
+        public EventManager eventManager;
 	public FriendManager friendManager;
 	public static MinecraftClient mc;
 	public String version = " b1.3";
@@ -32,12 +30,11 @@ public final class Argon {
 
 	public Argon() throws InterruptedException, IOException {
 		INSTANCE = this;
-		this.eventManager = new EventManager();
-		this.moduleManager = new ModuleManager();
-		this.clickGui = new ClickGui();
-		this.rotatorManager = new RotatorManager();
-		this.profileManager = new ProfileManager();
-		this.friendManager = new FriendManager();
+                this.eventManager = new EventManager();
+                this.moduleManager = new ModuleManager();
+                this.clickGui = new ClickGui();
+                this.profileManager = new ProfileManager();
+                this.friendManager = new FriendManager();
 
 		this.getProfileManager().loadProfile();
 		this.setLastModified();
