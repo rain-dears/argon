@@ -46,9 +46,9 @@ public class EndCrystalItemMixin {
 	}
 
 	@Unique
-	private BlockState getBlockState(BlockPos p) {
-		return mc.world.getBlockState(p);
-	}
+        private BlockState getBlockState(BlockPos p) {
+                return mc.world.getBlockState(p);
+        }
 
 	@Unique
 	private boolean canPlaceCrystalServer(BlockPos blockPos) {
@@ -59,28 +59,28 @@ public class EndCrystalItemMixin {
 	}
 
 	@Inject(method = "useOnBlock", at = @At("HEAD"))
-	private void onUse(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
-		NoBounce noBounce = Argon.INSTANCE.getModuleManager().getModule(NoBounce.class);
-		if (noBounce.isEnabled()) {
-			if (Argon.INSTANCE != null && mc.player != null) {
-				ItemStack mainHandStack = mc.player.getMainHandStack();
+        private void onUse(ItemUsageContext context, CallbackInfoReturnable<ActionResult> cir) {
+                if (Argon.INSTANCE == null || mc.player == null) return;
 
-				if (mainHandStack.isOf(Items.END_CRYSTAL)) {
-					Vec3d e = mc.player.getEyePos();
+                NoBounce noBounce = Argon.INSTANCE.getModuleManager().getModule(NoBounce.class);
+                if (noBounce != null && noBounce.isEnabled()) {
+                        ItemStack mainHandStack = mc.player.getMainHandStack();
 
-					BlockHitResult blockHit = mc.world.raycast(new RaycastContext(e, e.add(getClientLookVec().multiply(4.5)), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
-					if (isBlock(Blocks.OBSIDIAN, blockHit.getBlockPos()) || isBlock(Blocks.BEDROCK, blockHit.getBlockPos())) {
-						HitResult hitResult = mc.crosshairTarget;
+                        if (mainHandStack.isOf(Items.END_CRYSTAL)) {
+                                Vec3d e = mc.player.getEyePos();
 
-						if (hitResult instanceof BlockHitResult blockHit2) {
-							BlockPos pos = blockHit2.getBlockPos();
+                                BlockHitResult blockHit = mc.world.raycast(new RaycastContext(e, e.add(getClientLookVec().multiply(4.5)), RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mc.player));
+                                if (isBlock(Blocks.OBSIDIAN, blockHit.getBlockPos()) || isBlock(Blocks.BEDROCK, blockHit.getBlockPos())) {
+                                        HitResult hitResult = mc.crosshairTarget;
 
-							if (canPlaceCrystalServer(pos))
-								context.getStack().decrement(-1);
-						}
-					}
-				}
-			}
-		}
-	}
+                                        if (hitResult instanceof BlockHitResult blockHit2) {
+                                                BlockPos pos = blockHit2.getBlockPos();
+
+                                                if (canPlaceCrystalServer(pos))
+                                                        context.getStack().decrement(-1);
+                                        }
+                                }
+                        }
+                }
+        }
 }
