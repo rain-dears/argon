@@ -3,8 +3,6 @@ package dev.lvstrng.argon.mixin;
 import dev.lvstrng.argon.Argon;
 import dev.lvstrng.argon.event.EventManager;
 import dev.lvstrng.argon.event.events.AttackListener;
-import dev.lvstrng.argon.event.events.BlockBreakingListener;
-import dev.lvstrng.argon.event.events.HudListener;
 import dev.lvstrng.argon.event.events.ItemUseListener;
 import dev.lvstrng.argon.event.events.TickListener;
 import dev.lvstrng.argon.utils.MouseSimulation;
@@ -60,21 +58,8 @@ public class MinecraftClientMixin {
 		}
 	}
 
-	@Inject(method = "handleBlockBreaking", at = @At("HEAD"), cancellable = true)
-	private void onBlockBreaking(boolean breaking, CallbackInfo ci) {
-		BlockBreakingListener.BlockBreakingEvent event = new BlockBreakingListener.BlockBreakingEvent();
-
-		EventManager.fire(event);
-		if (event.isCancelled()) ci.cancel();
-
-		if (MouseSimulation.isMouseButtonPressed(GLFW.GLFW_MOUSE_BUTTON_1)) {
-			MouseSimulation.mouseButtons.put(GLFW.GLFW_MOUSE_BUTTON_1, false);
-			ci.cancel();
-		}
-	}
-
-	@Inject(method = "stop", at = @At("HEAD"))
-	private void onClose(CallbackInfo ci) {
-		Argon.INSTANCE.getProfileManager().saveProfile();
+        @Inject(method = "stop", at = @At("HEAD"))
+        private void onClose(CallbackInfo ci) {
+                Argon.INSTANCE.getProfileManager().saveProfile();
 	}
 }

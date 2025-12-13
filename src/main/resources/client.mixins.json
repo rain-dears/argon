@@ -7,7 +7,6 @@
     "ClientConnectionMixin"
   ],
   "client": [
-    "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerAccessor",
     "HandledScreenMixin",
     "InGameHudMixin",

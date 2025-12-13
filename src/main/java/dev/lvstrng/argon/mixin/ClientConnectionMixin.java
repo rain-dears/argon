@@ -2,7 +2,6 @@ package dev.lvstrng.argon.mixin;
 
 import dev.lvstrng.argon.event.EventManager;
 import dev.lvstrng.argon.event.events.PacketReceiveListener;
-import dev.lvstrng.argon.event.events.PacketSendListener;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
@@ -23,11 +22,4 @@ public class ClientConnectionMixin {
 		if (event.isCancelled()) ci.cancel();
 	}
 
-	@Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V", at = @At("HEAD"), cancellable = true)
-	private void onPacketSend(Packet<?> packet, CallbackInfo ci) {
-		PacketSendListener.PacketSendEvent event = new PacketSendListener.PacketSendEvent(packet);
-
-		EventManager.fire(event);
-		if (event.isCancelled()) ci.cancel();
-	}
 }

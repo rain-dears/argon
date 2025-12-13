@@ -1,11 +1,9 @@
 package dev.lvstrng.argon.utils;
 
 import dev.lvstrng.argon.Argon;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
@@ -19,10 +17,6 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.world.chunk.WorldChunk;
-
-import java.util.Objects;
-import java.util.stream.Stream;
 
 import static dev.lvstrng.argon.Argon.mc;
 
@@ -34,27 +28,9 @@ public final class WorldUtils {
 				.anyMatch(LivingEntity::isDead);
 	}
 
-	public static Entity findNearestEntity(PlayerEntity toPlayer, float radius, boolean seeOnly) {
-		float mr = Float.MAX_VALUE;
-		Entity entity = null;
-
-		assert mc.world != null;
-		for (Entity e : mc.world.getEntities()) {
-			float d = e.distanceTo(toPlayer);
-
-			if (e != toPlayer && d <= radius && mc.player.canSee(e) == seeOnly) {
-				if (d < mr) {
-					mr = d;
-					entity = e;
-				}
-			}
-		}
-		return entity;
-	}
-
-	public static double distance(Vec3d fromVec, Vec3d toVec) {
-		return Math.sqrt(Math.pow(toVec.x - fromVec.x, 2) + Math.pow(toVec.y - fromVec.y, 2) + Math.pow(toVec.z - fromVec.z, 2));
-	}
+        public static double distance(Vec3d fromVec, Vec3d toVec) {
+                return Math.sqrt(Math.pow(toVec.x - fromVec.x, 2) + Math.pow(toVec.y - fromVec.y, 2) + Math.pow(toVec.z - fromVec.z, 2));
+        }
 
 	public static PlayerEntity findNearestPlayer(PlayerEntity toPlayer, float range, boolean seeOnly, boolean excludeFriends) {
 		float minRange = Float.MAX_VALUE;
@@ -140,32 +116,6 @@ public final class WorldUtils {
 		if (result.isAccepted() && result.shouldSwingHand() && swingHand) mc.player.swingHand(Hand.MAIN_HAND);
 	}
 
-	public static Stream<WorldChunk> getLoadedChunks() {
-		int radius = Math.max(2, mc.options.getClampedViewDistance()) + 3;
-		int diameter = radius * 2 + 1;
-
-		ChunkPos center = mc.player.getChunkPos();
-		ChunkPos min = new ChunkPos(center.x - radius, center.z - radius);
-		ChunkPos max = new ChunkPos(center.x + radius, center.z + radius);
-
-		return Stream.iterate(min, pos -> {
-					int x = pos.x;
-					int z = pos.z;
-					x++;
-					if (x > max.x) {
-						x = min.x;
-						z++;
-					}
-					if (z > max.z)
-						throw new IllegalStateException("Stream limit didn't work.");
-
-					return new ChunkPos(x, z);
-
-				}).limit((long) diameter * diameter)
-				.filter(c -> mc.world.isChunkLoaded(c.x, c.z))
-				.map(c -> mc.world.getChunk(c.x, c.z)).filter(Objects::nonNull);
-	}
-
     /*
                 NORTH
 
@@ -204,12 +154,8 @@ public final class WorldUtils {
 		return material == ToolMaterials.DIAMOND || material == ToolMaterials.NETHERITE;
 	}
 
-	public static boolean isCrit(PlayerEntity player, Entity target) {
-		return player.getAttackCooldownProgress(0.5F) > 0.9F && player.fallDistance > 0.0F && !player.isOnGround() && !player.isClimbing() && !player.isSubmergedInWater() && !player.hasStatusEffect(StatusEffects.BLINDNESS) && target instanceof LivingEntity;
-	}
-
-	public static void hitEntity(Entity entity, boolean swingHand) {
-		mc.interactionManager.attackEntity(mc.player, entity);
+        public static void hitEntity(Entity entity, boolean swingHand) {
+                mc.interactionManager.attackEntity(mc.player, entity);
 
 		if (swingHand)
 			mc.player.swingHand(Hand.MAIN_HAND);
