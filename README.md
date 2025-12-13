@@ -8,7 +8,7 @@ I am writing this because I see a lot of people copying my work and selling it w
 
 You are allowed to modify the code of this client and publish your version of this client **either as open-source or closed-source, but not sold.** Please respect me, my project and yourself.
 
-# Argon Minecraft Ghost Client
+# Vxe Minecraft Ghost Client
 
 ## Why?
 
@@ -22,5 +22,5 @@ NOTE: Some of the stuff here is pasted by ablue lmaooo (Not damage utils, I was 
 
 - Launch the project in IntelliJ
 - Make a new configuration and make it do `build`
-- Find jar in project's `build/libs` (name should be argon-b1.1.jar unless you change it) 
+- Find jar in project's `build/libs` (name should be vxe-b1.1.jar unless you change it) 
 ![image](https://github.com/user-attachments/assets/b2e8853e-2916-4219-9443-85ff7549d418)
