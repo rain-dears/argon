@@ -1,36 +1,21 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "dev.lvstrng.argon.mixin",
+  "package": "dev.lvstrng.vxe.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ClientConnectionMixin",
-    "EndCrystalItemMixin",
-    "ItemStackMixin",
-    "LivingEntityAccessor",
-    "WorldAccessor"
+    "ClientConnectionMixin"
   ],
   "client": [
-    "BufferRendererAccessor",
-    "CameraMixin",
-    "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerAccessor",
-    "ClientPlayerInteractionManagerMixin",
-    "FrustumAccessor",
-    "GameRendererMixin",
     "HandledScreenMixin",
     "InGameHudMixin",
-    "KeyBindingAccessor",
-    "KeyBindingMixin",
     "KeyboardMixin",
     "MinecraftClientAccessor",
     "MinecraftClientMixin",
     "MouseHandlerAccessor",
     "MouseMixin",
-    "OtherClientPlayerEntityAccessor",
-    "ScreenMixin",
-    "ShaderProgramAccessor",
-    "WorldRendererAccessor"
+    "ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
