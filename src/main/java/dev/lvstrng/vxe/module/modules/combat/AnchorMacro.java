@@ -37,7 +37,7 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
         private final BooleanSetting onlyCharge = new BooleanSetting(EncryptedString.of("Only Charge"), false);
         private final BooleanSetting useHoldLogic = new BooleanSetting(EncryptedString.of("Hold Logic"), true)
                         .setDescription(EncryptedString.of("If enabled, runs the place/charge/explode chain while the hold key is pressed"));
-        private final KeybindSetting activationKey = new KeybindSetting(EncryptedString.of("Hold Key"), GLFW.GLFW_MOUSE_BUTTON_4, true)
+        private final KeybindSetting activationKey = new KeybindSetting(EncryptedString.of("Hold Key"), GLFW.GLFW_MOUSE_BUTTON_4, false)
                         .setDescription(EncryptedString.of("Macro runs only while this key is held (Mouse Button 5 by default)"));
 
         private int switchClock = 0;
@@ -88,7 +88,7 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
                         return;
                 }
 
-                if (!KeyUtils.isKeyPressed(activationKey.getValue())) {
+                if (!KeyUtils.isKeyPressed(activationKey.getKey())) {
                         resetMacroState();
                         return;
                 }
@@ -102,8 +102,13 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
                 if (!(mc.crosshairTarget instanceof BlockHitResult hit))
                         return;
 
+                BlockHitResult placementHit = resolvePlacementHit(hit);
+
+                if (placementHit == null)
+                        return;
+
                 if (step == MacroStep.IDLE) {
-                        targetHit = resolvePlacementHit(hit);
+                        targetHit = placementHit;
                         targetAnchor = targetHit.getBlockPos();
                         switchClock = glowstoneClock = explodeClock = 0;
                         step = MacroStep.PLACE_ANCHOR;
@@ -172,6 +177,11 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
                 if (BlockUtils.isBlock(targetAnchor, Blocks.RESPAWN_ANCHOR)) {
                         step = MacroStep.CHARGE_ANCHOR;
                         glowstoneClock = 0;
+                        return;
+                }
+
+                if (!canPlaceAnchorAt(targetAnchor)) {
+                        resetMacroState();
                         return;
                 }
 
@@ -288,12 +298,35 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
                 if (BlockUtils.isBlock(base, Blocks.RESPAWN_ANCHOR))
                         return new BlockHitResult(Vec3d.ofCenter(base), hit.getSide(), base, false);
 
+                if (mc.world.getBlockState(base).isAir())
+                        return null;
+
                 BlockPos placePos = mc.world.getBlockState(base).isReplaceable() ? base : base.offset(hit.getSide());
+
+                if (!canPlaceAnchorAt(placePos))
+                        return null;
+
                 return new BlockHitResult(Vec3d.ofCenter(placePos), hit.getSide(), placePos, false);
         }
 
+        private boolean canPlaceAnchorAt(BlockPos placePos) {
+                if (BlockUtils.isBlock(placePos, Blocks.RESPAWN_ANCHOR))
+                        return false;
+
+                if (!mc.world.getWorldBorder().contains(placePos))
+                        return false;
+
+                if (mc.world.isAir(placePos.down()))
+                        return false;
+
+                if (!mc.world.getBlockState(placePos).isReplaceable())
+                        return false;
+
+                return CrystalUtils.canPlaceCrystalClientAssumeObsidian(placePos.down());
+        }
+
         private void runHoldLogic() {
-                if (!KeyUtils.isKeyPressed(activationKey.getValue())) {
+                if (!KeyUtils.isKeyPressed(activationKey.getKey())) {
                         resetMacroState();
                         return;
                 }
@@ -308,6 +341,9 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
                         return;
 
                 BlockHitResult placementHit = resolvePlacementHit(hit);
+
+                if (placementHit == null)
+                        return;
                 BlockPos targetPos = placementHit.getBlockPos();
 
                 if (onlyOwn.getValue() && BlockUtils.isBlock(targetPos, Blocks.RESPAWN_ANCHOR) && !ownedAnchors.contains(targetPos))
@@ -330,6 +366,9 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
         }
 
         private void attemptPlaceAnchor(BlockHitResult placementHit) {
+                if (!canPlaceAnchorAt(placementHit.getBlockPos()))
+                        return;
+
                 if (MathUtils.randomInt(1, 100) > placeChance.getValueInt())
                         return;
 

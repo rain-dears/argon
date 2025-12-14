@@ -7,6 +7,7 @@ import dev.lvstrng.vxe.module.setting.BooleanSetting;
 import dev.lvstrng.vxe.module.setting.KeybindSetting;
 import dev.lvstrng.vxe.module.setting.NumberSetting;
 import dev.lvstrng.vxe.utils.BlockUtils;
+import dev.lvstrng.vxe.utils.CrystalUtils;
 import dev.lvstrng.vxe.utils.EncryptedString;
 import dev.lvstrng.vxe.utils.InventoryUtils;
 import dev.lvstrng.vxe.utils.KeyUtils;
@@ -26,7 +27,7 @@ import org.lwjgl.glfw.GLFW;
  * Charges anchors on demand without detonating them.
  */
 public final class AnchorFill extends Module implements TickListener {
-        private final KeybindSetting activationKey = new KeybindSetting(EncryptedString.of("Hold Key"), GLFW.GLFW_MOUSE_BUTTON_RIGHT, true)
+        private final KeybindSetting activationKey = new KeybindSetting(EncryptedString.of("Hold Key"), GLFW.GLFW_MOUSE_BUTTON_RIGHT, false)
                         .setDescription(EncryptedString.of("Fills anchors only while this key is held"));
         private final BooleanSetting useRightClickLogic = new BooleanSetting(EncryptedString.of("Right Click Flow"), true)
                         .setDescription(EncryptedString.of("If enabled, runs the fill flow while holding right-click instead of the hotkey"));
@@ -68,7 +69,7 @@ public final class AnchorFill extends Module implements TickListener {
                         return;
                 }
 
-                if (!KeyUtils.isKeyPressed(activationKey.getValue()))
+                if (!KeyUtils.isKeyPressed(activationKey.getKey()))
                         return;
 
                 if (!(mc.crosshairTarget instanceof BlockHitResult hit))
@@ -110,6 +111,9 @@ public final class AnchorFill extends Module implements TickListener {
 
                 BlockHitResult placementHit = resolvePlacementHit(hit);
 
+                if (placementHit == null)
+                        return;
+
                 if (!BlockUtils.isBlock(placementHit.getBlockPos(), Blocks.RESPAWN_ANCHOR)) {
                         attemptAnchorPlacement(placementHit);
                         return;
@@ -123,6 +127,9 @@ public final class AnchorFill extends Module implements TickListener {
 
         private void attemptAnchorPlacement(BlockHitResult placementHit) {
                 if (!timer.hasReached(placeDelay.getValueInt() * 50L))
+                        return;
+
+                if (!canPlaceAnchorAt(placementHit.getBlockPos()))
                         return;
 
                 if (!InventoryUtils.selectItemFromHotbar(Items.RESPAWN_ANCHOR))
@@ -152,8 +159,35 @@ public final class AnchorFill extends Module implements TickListener {
 
         private BlockHitResult resolvePlacementHit(BlockHitResult hit) {
                 BlockPos base = hit.getBlockPos();
+
+                if (BlockUtils.isBlock(base, Blocks.RESPAWN_ANCHOR))
+                        return new BlockHitResult(Vec3d.ofCenter(base), hit.getSide(), base, false);
+
+                if (mc.world.getBlockState(base).isAir())
+                        return null;
+
                 BlockPos placePos = mc.world.getBlockState(base).isReplaceable() ? base : base.offset(hit.getSide());
+
+                if (!canPlaceAnchorAt(placePos))
+                        return null;
+
                 return new BlockHitResult(Vec3d.ofCenter(placePos), hit.getSide(), placePos, false);
+        }
+
+        private boolean canPlaceAnchorAt(BlockPos placePos) {
+                if (BlockUtils.isBlock(placePos, Blocks.RESPAWN_ANCHOR))
+                        return false;
+
+                if (!mc.world.getWorldBorder().contains(placePos))
+                        return false;
+
+                if (mc.world.isAir(placePos.down()))
+                        return false;
+
+                if (!mc.world.getBlockState(placePos).isReplaceable())
+                        return false;
+
+                return CrystalUtils.canPlaceCrystalClientAssumeObsidian(placePos.down());
         }
 
         private Hand getGlowstoneHand() {
