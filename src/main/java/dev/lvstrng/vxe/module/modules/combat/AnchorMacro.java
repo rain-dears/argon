@@ -35,6 +35,8 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
         private final NumberSetting explodeSlot = new NumberSetting(EncryptedString.of("Explode Slot"), 1, 9, 1, 1);
         private final BooleanSetting onlyOwn = new BooleanSetting(EncryptedString.of("Only Own"), false);
         private final BooleanSetting onlyCharge = new BooleanSetting(EncryptedString.of("Only Charge"), false);
+        private final BooleanSetting useHoldLogic = new BooleanSetting(EncryptedString.of("Hold Logic"), true)
+                        .setDescription(EncryptedString.of("If enabled, runs the place/charge/explode chain while the hold key is pressed"));
         private final KeybindSetting activationKey = new KeybindSetting(EncryptedString.of("Hold Key"), GLFW.GLFW_MOUSE_BUTTON_4, true)
                         .setDescription(EncryptedString.of("Macro runs only while this key is held (Mouse Button 5 by default)"));
 
@@ -54,7 +56,7 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
                                 EncryptedString.of("Automatically blows up respawn anchors for you"),
                                 -1,
                                 Category.COMBAT);
-                addSettings(whileUse, stopOnKill, clickSimulation, placeChance, switchDelay, switchChance, glowstoneDelay, glowstoneChance, explodeDelay, explodeChance, explodeSlot, onlyOwn, onlyCharge, activationKey);
+                addSettings(whileUse, stopOnKill, clickSimulation, placeChance, switchDelay, switchChance, glowstoneDelay, glowstoneChance, explodeDelay, explodeChance, explodeSlot, onlyOwn, onlyCharge, useHoldLogic, activationKey);
         }
 
 	@Override
@@ -76,10 +78,15 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
                 super.onDisable();
         }
 
-	@Override
+        @Override
         public void onTick() {
                 if (mc.currentScreen != null)
                         return;
+
+                if (useHoldLogic.getValue()) {
+                        runHoldLogic();
+                        return;
+                }
 
                 if (!KeyUtils.isKeyPressed(activationKey.getValue())) {
                         resetMacroState();
@@ -283,6 +290,118 @@ public final class AnchorMacro extends Module implements TickListener, ItemUseLi
 
                 BlockPos placePos = mc.world.getBlockState(base).isReplaceable() ? base : base.offset(hit.getSide());
                 return new BlockHitResult(Vec3d.ofCenter(placePos), hit.getSide(), placePos, false);
+        }
+
+        private void runHoldLogic() {
+                if (!KeyUtils.isKeyPressed(activationKey.getValue())) {
+                        resetMacroState();
+                        return;
+                }
+
+                if (!whileUse.getValue() && mc.player.isUsingItem())
+                        return;
+
+                if (stopOnKill.getValue() && WorldUtils.isDeadBodyNearby())
+                        return;
+
+                if (!(mc.crosshairTarget instanceof BlockHitResult hit))
+                        return;
+
+                BlockHitResult placementHit = resolvePlacementHit(hit);
+                BlockPos targetPos = placementHit.getBlockPos();
+
+                if (onlyOwn.getValue() && BlockUtils.isBlock(targetPos, Blocks.RESPAWN_ANCHOR) && !ownedAnchors.contains(targetPos))
+                        return;
+
+                if (!BlockUtils.isBlock(targetPos, Blocks.RESPAWN_ANCHOR)) {
+                        attemptPlaceAnchor(placementHit);
+                        return;
+                }
+
+                if (!BlockUtils.isAnchorCharged(targetPos)) {
+                        attemptChargeAnchor(placementHit);
+                        return;
+                }
+
+                if (onlyCharge.getValue())
+                        return;
+
+                attemptExplodeAnchor(placementHit);
+        }
+
+        private void attemptPlaceAnchor(BlockHitResult placementHit) {
+                if (MathUtils.randomInt(1, 100) > placeChance.getValueInt())
+                        return;
+
+                if (!InventoryUtils.selectItemFromHotbar(Items.RESPAWN_ANCHOR))
+                        return;
+
+                if (switchClock < switchDelay.getValueInt()) {
+                        switchClock++;
+                        return;
+                }
+
+                switchClock = 0;
+
+                if (clickSimulation.getValue())
+                        MouseSimulation.mouseClick(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+
+                WorldUtils.placeBlock(placementHit, true);
+                ownedAnchors.add(placementHit.getBlockPos());
+        }
+
+        private void attemptChargeAnchor(BlockHitResult placementHit) {
+                if (!selectGlowstone())
+                        return;
+
+                if (glowstoneClock < glowstoneDelay.getValueInt()) {
+                        glowstoneClock++;
+                        return;
+                }
+
+                glowstoneClock = 0;
+
+                if (MathUtils.randomInt(1, 100) > glowstoneChance.getValueInt())
+                        return;
+
+                if (clickSimulation.getValue())
+                        MouseSimulation.mouseClick(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+
+                WorldUtils.placeBlock(placementHit, true);
+        }
+
+        private void attemptExplodeAnchor(BlockHitResult placementHit) {
+                int slot = explodeSlot.getValueInt() - 1;
+
+                if (mc.player.getInventory().selectedSlot != slot) {
+                        if (switchClock < switchDelay.getValueInt()) {
+                                switchClock++;
+                                return;
+                        }
+
+                        switchClock = 0;
+
+                        if (MathUtils.randomInt(1, 100) <= switchChance.getValueInt())
+                                mc.player.getInventory().selectedSlot = slot;
+
+                        return;
+                }
+
+                if (explodeClock < explodeDelay.getValueInt()) {
+                        explodeClock++;
+                        return;
+                }
+
+                explodeClock = 0;
+
+                if (MathUtils.randomInt(1, 100) > explodeChance.getValueInt())
+                        return;
+
+                if (clickSimulation.getValue())
+                        MouseSimulation.mouseClick(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+
+                WorldUtils.placeBlock(placementHit, true);
+                ownedAnchors.remove(placementHit.getBlockPos());
         }
 
         private void resetMacroState() {
